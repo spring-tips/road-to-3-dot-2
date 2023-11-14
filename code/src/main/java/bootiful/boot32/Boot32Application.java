@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -69,7 +70,8 @@ class RestClientConfiguration {
 
     @Bean
     RestClient restClient(RestClient.Builder builder) {
-        return builder.build();
+        // see https://github.com/spring-projects/spring-framework/issues/31590
+        return builder.requestFactory( new JdkClientHttpRequestFactory()).build();
     }
 }
 
