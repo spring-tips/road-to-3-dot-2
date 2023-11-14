@@ -1,10 +1,8 @@
 package bootiful.boot32;
 
-import jakarta.annotation.PostConstruct;
-import org.apache.commons.logging.Log;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -12,26 +10,25 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
-import org.springframework.core.task.TaskExecutor;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.client.RestClient;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.logging.Logger;
 
 //https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.2.0-M1-Release-Notes#logged-application-name
 @SpringBootApplication
@@ -42,9 +39,108 @@ public class Boot32Application {
     }
 
     @Bean
-    ApplicationRunner applicationRunner (){
-        return a -> System.out.println(new File(".").getAbsolutePath());
+    ApplicationRunner applicationRunner() {
+        return arrrrrgImAPirate -> System.out.println(new File(".").getAbsolutePath());
     }
+}
+
+@Configuration
+class JdbcConfiguration {
+
+    @Bean
+    JdbcClient jdbcClient(DataSource dataSource) {
+        return JdbcClient.create(dataSource);
+    }
+
+    @Bean
+    ApplicationRunner customerServiceRunner(CustomerService customerService) {
+        return args -> customerService.customers().forEach(System.out::println);
+    }
+
+}
+
+@Configuration
+class RestClientConfiguration {
+
+    @Bean
+    ApplicationRunner weatherServiceRunner(WeatherService weatherService) {
+        return args -> System.out.println(weatherService.weatherFor(  -158.0037091f,21.3841965f).toString());
+    }
+
+    @Bean
+    RestClient restClient(RestClient.Builder builder) {
+        return builder.build();
+    }
+}
+
+
+@Controller
+class WeatherService {
+
+//    curl "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m"
+
+    private final String url = " https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&current=temperature_2m,wind_speed_10m ".trim() ;
+
+    private final ObjectMapper objectMapper;
+    private final RestClient rest;
+
+    WeatherService(ObjectMapper objectMapper, RestClient rest) {
+        this.objectMapper = objectMapper;
+        this.rest = rest;
+    }
+
+    Weather weatherFor(float longitude, float latitude) throws JsonProcessingException {
+        var jsonString = this.rest.get().uri(this.url.formatted( latitude ,longitude)).retrieve().toEntity(String.class).getBody();
+        var json = this.objectMapper.readValue(jsonString, JsonNode.class);
+        var currentJson = json.get("current");
+        var time = currentJson.get("time").asText();
+        var temp2m = currentJson.get("temperature_2m").floatValue();
+        var windSpeed10m = currentJson.get("wind_speed_10m").floatValue();
+        return new Weather(windSpeed10m, temp2m, time);
+    }
+
+
+}
+
+record Weather(float windSpeed10Km, float temperature, String time) {
+}
+
+@Service
+@Transactional
+class CustomerService {
+
+    private final JdbcClient jdbc;
+
+    CustomerService(JdbcClient jdbc) {
+        this.jdbc = jdbc;
+    }
+
+    Collection<Customer> customers() {
+        return this.jdbc
+                .sql(" select * from CUSTOMER  ")
+                .query((rs, rowNum) -> new Customer(rs.getInt("id"), rs.getString("name")))
+                .list();
+    }
+
+}
+
+@Controller
+@ResponseBody
+class CustomerController {
+
+    private final CustomerService customerService;
+
+    CustomerController(CustomerService customerService) {
+        this.customerService = customerService;
+    }
+
+    @GetMapping("/customers")
+    Collection<Customer> customers() {
+        return this.customerService.customers();
+    }
+}
+
+record Customer(Integer id, String name) {
 }
 
 /*
@@ -64,11 +160,11 @@ run this:
 * */
 @Controller
 @ResponseBody
-class  GreetingsController {
+class GreetingsController {
 
 
-    @Scheduled (fixedDelay = 1000)
-    void scheduled (){
+    @Scheduled(fixedDelay = 1000)
+    void scheduled() {
         System.out.println("scheduled on thread " + Thread.currentThread());
     }
 
@@ -142,10 +238,10 @@ class LoomConfiguration {
     @Bean
     TaskDecorator taskDecorator() {
         return runnable -> () -> {
-            System.out.println("decorator: running before the thread "+
+            System.out.println("decorator: running before the thread " +
                     Thread.currentThread());
             runnable.run();
-            System.out.println("decorator: running before the thread "+
+            System.out.println("decorator: running before the thread " +
                     Thread.currentThread());
         };
     }
