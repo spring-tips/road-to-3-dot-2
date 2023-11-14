@@ -65,13 +65,13 @@ class RestClientConfiguration {
 
     @Bean
     ApplicationRunner weatherServiceRunner(WeatherService weatherService) {
-        return args -> System.out.println(weatherService.weatherFor(  -158.0037091f,21.3841965f).toString());
+        return args -> System.out.println(weatherService.weatherFor(-158.0037091f, 21.3841965f).toString());
     }
 
     @Bean
     RestClient restClient(RestClient.Builder builder) {
         // see https://github.com/spring-projects/spring-framework/issues/31590
-        return builder.requestFactory( new JdkClientHttpRequestFactory()).build();
+        return builder.requestFactory(new JdkClientHttpRequestFactory()).build();
     }
 }
 
@@ -79,9 +79,10 @@ class RestClientConfiguration {
 @Controller
 class WeatherService {
 
-//    curl "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m"
 
-    private final String url = " https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&current=temperature_2m,wind_speed_10m ".trim() ;
+    // curl "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m"
+
+    private final String url = " https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&current=temperature_2m,wind_speed_10m ".trim();
 
     private final ObjectMapper objectMapper;
     private final RestClient rest;
@@ -92,7 +93,7 @@ class WeatherService {
     }
 
     Weather weatherFor(float longitude, float latitude) throws JsonProcessingException {
-        var jsonString = this.rest.get().uri(this.url.formatted( latitude ,longitude)).retrieve().toEntity(String.class).getBody();
+        var jsonString = this.rest.get().uri(this.url.formatted(latitude, longitude)).retrieve().toEntity(String.class).getBody();
         var json = this.objectMapper.readValue(jsonString, JsonNode.class);
         var currentJson = json.get("current");
         var time = currentJson.get("time").asText();
