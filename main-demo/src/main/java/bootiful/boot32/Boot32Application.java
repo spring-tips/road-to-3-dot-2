@@ -1,9 +1,15 @@
 package bootiful.boot32;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.ApplicationArguments;
+import java.io.File;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentSkipListSet;
+
+import javax.sql.DataSource;
+
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,14 +28,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClient;
 
-import javax.sql.DataSource;
-import java.io.File;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentSkipListSet;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 //https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.2.0-M1-Release-Notes#logged-application-name
 @SpringBootApplication
@@ -75,13 +76,10 @@ class RestClientConfiguration {
     }
 }
 
-
 @Controller
 class WeatherService {
 
-
     // curl "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m"
-
     private final String url = " https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&current=temperature_2m,wind_speed_10m ".trim();
 
     private final ObjectMapper objectMapper;
@@ -102,10 +100,10 @@ class WeatherService {
         return new Weather(windSpeed10m, temp2m, time);
     }
 
-
 }
 
 record Weather(float windSpeed10Km, float temperature, String time) {
+
 }
 
 @Service
@@ -144,6 +142,7 @@ class CustomerController {
 }
 
 record Customer(Integer id, String name) {
+
 }
 
 /*
@@ -165,7 +164,6 @@ run this:
 @ResponseBody
 class GreetingsController {
 
-
     @Scheduled(fixedDelay = 1000)
     void scheduled() {
         System.out.println("scheduled on thread " + Thread.currentThread());
@@ -180,7 +178,6 @@ class GreetingsController {
 @Service
 @Async
 class AsyncCustomerService {
-
 
     CompletableFuture<Instant> sendEmail() throws Exception {
         System.out.println("before sending email on thread " + Thread.currentThread());
@@ -210,42 +207,53 @@ class LoomConfiguration {
                 threads.add(Thread.ofVirtual().unstarted(() -> {
                     try {
                         Thread.sleep(100);
-                        if (0 == index) observed.add(Thread.currentThread().toString());
+                        if (0 == index) {
+                            observed.add(Thread.currentThread().toString());
+                        }
 
                         Thread.sleep(100);
-                        if (0 == index) observed.add(Thread.currentThread().toString());
+                        if (0 == index) {
+                            observed.add(Thread.currentThread().toString());
+                        }
 
                         Thread.sleep(100);
-                        if (0 == index) observed.add(Thread.currentThread().toString());
+                        if (0 == index) {
+                            observed.add(Thread.currentThread().toString());
+                        }
 
                         Thread.sleep(100);
-                        if (0 == index) observed.add(Thread.currentThread().toString());
+                        if (0 == index) {
+                            observed.add(Thread.currentThread().toString());
+                        }
 
-                    }  //
+                    } //
                     catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }));
             }
 
-            for (var t : threads) t.start();
+            for (var t : threads) {
+                t.start();
+            }
 
-            for (var t : threads) t.join();
+            for (var t : threads) {
+                t.join();
+            }
 
             System.out.println(observed);
 
         };
     }
 
-
     @Bean
     TaskDecorator taskDecorator() {
         return runnable -> () -> {
-            System.out.println("decorator: running before the thread " +
-                    Thread.currentThread());
+            System.out.println("decorator: running before the thread "
+                    + Thread.currentThread());
             runnable.run();
-            System.out.println("decorator: running before the thread " +
-                    Thread.currentThread());
+            System.out.println("decorator: running before the thread "
+                    + Thread.currentThread());
         };
     }
 }
