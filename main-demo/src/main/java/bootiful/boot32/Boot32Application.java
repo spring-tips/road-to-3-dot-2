@@ -1,20 +1,12 @@
 package bootiful.boot32;
 
-import java.io.File;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentSkipListSet;
-
-import javax.sql.DataSource;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -24,15 +16,24 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.annotation.GetExchange;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.sql.DataSource;
+import java.io.File;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentSkipListSet;
 
-//https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.2.0-M1-Release-Notes#logged-application-name
+// https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.2.0-M1-Release-Notes#logged-application-name
 @SpringBootApplication
 public class Boot32Application {
 
@@ -65,8 +66,21 @@ class JdbcConfiguration {
 class RestClientConfiguration {
 
     @Bean
-    ApplicationRunner weatherServiceRunner(WeatherService weatherService) {
-        return args -> System.out.println(weatherService.weatherFor(-158.0037091f, 21.3841965f).toString());
+    DeclarativeClientFacts declarativeClientFacts(RestClient restClient) {
+        return HttpServiceProxyFactory
+                .builder()
+                .exchangeAdapter(RestClientAdapter.create(restClient))
+                .build()
+                .createClient(DeclarativeClientFacts.class);
+    }
+
+    @Bean
+    ApplicationRunner catsRunner(Cats[] cats) {
+        return args -> {
+            System.out.println("-----------------");
+            for (var c : cats)
+                c.facts().forEach(System.out::println);
+        };
     }
 
     @Bean
@@ -76,35 +90,45 @@ class RestClientConfiguration {
     }
 }
 
-@Controller
-class WeatherService {
+interface Cats {
+    Collection<CatFact> facts();
+}
 
-    // curl "https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m"
-    private final String url = " https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&current=temperature_2m,wind_speed_10m ".trim();
 
-    private final ObjectMapper objectMapper;
+interface DeclarativeClientFacts extends Cats {
+
+    @Override
+    @GetExchange("https://cat-fact.herokuapp.com/facts/")
+    Collection<CatFact> facts();
+}
+
+@Service
+class RestClientCats
+        implements Cats {
+
+    private final String url = " https://cat-fact.herokuapp.com/facts/".trim();
+
     private final RestClient rest;
 
-    WeatherService(ObjectMapper objectMapper, RestClient rest) {
-        this.objectMapper = objectMapper;
+    private final ParameterizedTypeReference<Collection<CatFact>> cats = new ParameterizedTypeReference<Collection<CatFact>>() {
+    };
+
+    RestClientCats(RestClient rest) {
         this.rest = rest;
     }
 
-    Weather weatherFor(float longitude, float latitude) throws JsonProcessingException {
-        var jsonString = this.rest.get().uri(this.url.formatted(latitude, longitude)).retrieve().toEntity(String.class).getBody();
-        var json = this.objectMapper.readValue(jsonString, JsonNode.class);
-        var currentJson = json.get("current");
-        var time = currentJson.get("time").asText();
-        var temp2m = currentJson.get("temperature_2m").floatValue();
-        var windSpeed10m = currentJson.get("wind_speed_10m").floatValue();
-        return new Weather(windSpeed10m, temp2m, time);
+    @Override
+    public Collection<CatFact> facts() {
+        var responseEntity = this.rest.get().uri(this.url).retrieve().toEntity(this.cats);
+        Assert.state(responseEntity.getStatusCode().is2xxSuccessful(), "the request should've succeeded");
+        return responseEntity.getBody();
     }
-
 }
 
-record Weather(float windSpeed10Km, float temperature, String time) {
-
+//curl --location 'https://cat-fact.herokuapp.com/facts/'
+record CatFact(String text, @JsonProperty("_id") String id) {
 }
+
 
 @Service
 @Transactional
