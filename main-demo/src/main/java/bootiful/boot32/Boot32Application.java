@@ -1,6 +1,10 @@
 package bootiful.boot32;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.micrometer.observation.annotation.Observed;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -77,9 +81,11 @@ class RestClientConfiguration {
     @Bean
     ApplicationRunner catsRunner(Cats[] cats) {
         return args -> {
-            System.out.println("-----------------");
-            for (var c : cats)
+            var logger = LoggerFactory.getLogger(getClass());
+            logger.info("---------------------------------------------------");
+            for (var c : cats) {
                 c.facts().forEach(System.out::println);
+            }
         };
     }
 
@@ -103,8 +109,7 @@ interface DeclarativeClientFacts extends Cats {
 }
 
 @Service
-class RestClientCats
-        implements Cats {
+class RestClientCats   implements Cats {
 
     private final String url = " https://cat-fact.herokuapp.com/facts/".trim();
 
@@ -117,8 +122,10 @@ class RestClientCats
         this.rest = rest;
     }
 
+    @Observed (name = "rest-client-cats")
     @Override
     public Collection<CatFact> facts() {
+        LoggerFactory.getLogger(getClass()).info("calling the RestClient cats endpoint");
         var responseEntity = this.rest.get().uri(this.url).retrieve().toEntity(this.cats);
         Assert.state(responseEntity.getStatusCode().is2xxSuccessful(), "the request should've succeeded");
         return responseEntity.getBody();
