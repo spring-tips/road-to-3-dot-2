@@ -5,6 +5,7 @@ import io.micrometer.observation.annotation.Observed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -39,6 +40,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 // https://github.com/spring-projects/spring-boot/wiki/Spring-Boot-3.2.0-M1-Release-Notes#logged-application-name
 @SpringBootApplication
+@RegisterReflectionForBinding (CatFact.class)
 public class Boot32Application {
 
     public static void main(String[] args) {
