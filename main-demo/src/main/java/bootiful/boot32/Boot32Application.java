@@ -2,9 +2,7 @@ package bootiful.boot32;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.micrometer.observation.annotation.Observed;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -111,7 +109,7 @@ interface DeclarativeClientFacts extends Cats {
 }
 
 @Service
-class RestClientCats   implements Cats {
+class RestClientCats implements Cats {
 
     private final String url = " https://cat-fact.herokuapp.com/facts/".trim();
 

@@ -1,8 +1,9 @@
 # README 
 
 # TOC
-* project loom 
 * the new clients
-* project crac
+* observability 
+* project loom 
 * ssl reload
-* 
+* graalvm (appcds) 
+* crac
