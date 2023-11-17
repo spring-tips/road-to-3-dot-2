@@ -11,3 +11,4 @@
  * run the program without the checkpoint: `java -jar /opt/app/crac-0.0.1-SNAPSHOT.jar`. hit the endpoint 
  * run the program with the checkpoint: `java -XX:CRaCRestoreFrom=/opt/crac-files `
 
+NB: Spring can automatically capture a checkpoint once it's done starting up and initializing things. Use `-Dspring.context.checkpoint=onRefresh` when running the program. This allows you to skip all the business with the second shell.
