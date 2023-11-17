@@ -1,9 +1,0 @@
-services:
-  postgres:
-    image: 'postgres:latest'
-    environment:
-      - 'POSTGRES_DB=bootiful'
-      - 'POSTGRES_PASSWORD=bootiful'
-      - 'POSTGRES_USER=bootiful'
-    ports:
-      - '5432:5432'

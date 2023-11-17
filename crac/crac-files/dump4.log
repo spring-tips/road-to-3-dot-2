@@ -1,0 +1,117 @@
+(00.000496) Version: 3.17.1-crac (gitid b20-11-g6a0d7cf+1)
+(00.000637) Running on ubuntu-linux-22-04-02-desktop Linux 5.15.0-88-generic #98-Ubuntu SMP Mon Oct 2 15:23:16 UTC 2023 aarch64
+(00.000692) File /run/criu.kdat does not exist
+(00.000742) sockets: Probing sock diag modules
+(00.021092) sockets: Done probing
+(00.021192) Pagemap provides flags only
+(00.021251) Found anon-shmem device at 1
+(00.021300) Hugetlb size 0 Mb is supported but cannot get dev's number
+(00.021332) Hugetlb size 2 Mb is supported but cannot get dev's number
+(00.021356) Hugetlb size 32 Mb is supported but cannot get dev's number
+(00.021380) Hugetlb size 1024 Mb is supported but cannot get dev's number
+(00.021402) Reset 48251's dirty tracking
+(00.021428) Dirty tracking support is OFF
+(00.021448) Zero page detection failed, optimization turns off.
+(00.021488) Found task size of 1000000000000
+(00.021521) Warn  (criu/proc_parse.c:930): Write 4294967295 to /proc/self/loginuid failed: Operation not permitted
+(00.025129) Warn  (criu/net.c:3430): Unable to get tun network namespace
+(00.025179) Warn  (criu/sk-unix.c:224): unix: Unable to open a socket file: Operation not permitted
+(00.025407) Warn  (criu/net.c:3714): Unable create a network namespace: Operation not permitted
+(00.025641) Warn  (criu/net.c:3770): NSID isn't reported for network links
+(00.025699) uffd: Lazy pages are not available: Operation not permitted
+(00.025805) vdso: Parsing at ffffb5d60000 ffffb5d61000
+(00.025834) vdso: PT_LOAD p_vaddr: 0
+(00.025853) vdso: DT_HASH: e8
+(00.025873) vdso: DT_STRTAB: 1a8
+(00.025895) vdso: DT_SYMTAB: 118
+(00.025915) vdso: DT_STRSZ: 77
+(00.025935) vdso: DT_SYMENT: 18
+(00.025954) vdso: nbucket 3 nchain 6 bucket ffffb5d600f0 chain ffffb5d600fc
+(00.025974) vdso: rt [vdso] ffffb5d60000-ffffb5d61000 [vvar] ffffb5d5e000-ffffb5d60000
+(00.026135) Warn  (criu/net.c:3430): Unable to get socket network namespace
+(00.026191) Warn  (criu/kerndat.c:1466): CRIU was built without libnftables support
+(00.026253) Warn  (criu/kerndat.c:1009): Fail to mount tmfps to /tmp/.criu.move_mount_set_group.HZrsLq: Operation not permitted
+(00.026452) Adjust mmap_min_addr 0x8000 -> 0x10000
+(00.026473) Found mmap_min_addr 0x10000
+(00.026496) files stat: fs/nr_open 1048576
+(00.026516) skip kerndat_save_cache
+(00.026560) ========================================
+(00.026580) Dumping processes (pid: 48033)
+(00.026599) ========================================
+(00.026619) rlimit: RLIMIT_NOFILE unlimited for self
+(00.026656) Running pre-dump scripts
+(00.027406) irmap: Searching irmap cache in work dir
+(00.027488) No irmap-cache image
+(00.027506) irmap: Searching irmap cache in parent
+(00.027608) No parent images directory provided
+(00.027646) irmap: No irmap cache
+(00.027693) vdso: VDSO detection turned off
+(00.027709) cg-prop: Parsing controller "cpu"
+(00.027725) cg-prop: 	Strategy "replace"
+(00.027749) cg-prop: 	Property "cpu.shares"
+(00.027766) cg-prop: 	Property "cpu.cfs_period_us"
+(00.027780) cg-prop: 	Property "cpu.cfs_quota_us"
+(00.027795) cg-prop: 	Property "cpu.rt_period_us"
+(00.027818) cg-prop: 	Property "cpu.rt_runtime_us"
+(00.027843) cg-prop: Parsing controller "memory"
+(00.027860) cg-prop: 	Strategy "replace"
+(00.027887) cg-prop: 	Property "memory.limit_in_bytes"
+(00.027903) cg-prop: 	Property "memory.memsw.limit_in_bytes"
+(00.027918) cg-prop: 	Property "memory.swappiness"
+(00.027940) cg-prop: 	Property "memory.soft_limit_in_bytes"
+(00.027955) cg-prop: 	Property "memory.move_charge_at_immigrate"
+(00.027973) cg-prop: 	Property "memory.oom_control"
+(00.027993) cg-prop: 	Property "memory.use_hierarchy"
+(00.028008) cg-prop: 	Property "memory.kmem.limit_in_bytes"
+(00.028022) cg-prop: 	Property "memory.kmem.tcp.limit_in_bytes"
+(00.028048) cg-prop: Parsing controller "cpuset"
+(00.028064) cg-prop: 	Strategy "replace"
+(00.028080) cg-prop: 	Property "cpuset.cpus"
+(00.028098) cg-prop: 	Property "cpuset.mems"
+(00.028129) cg-prop: 	Property "cpuset.memory_migrate"
+(00.028147) cg-prop: 	Property "cpuset.cpu_exclusive"
+(00.028169) cg-prop: 	Property "cpuset.mem_exclusive"
+(00.028196) cg-prop: 	Property "cpuset.mem_hardwall"
+(00.028237) cg-prop: 	Property "cpuset.memory_spread_page"
+(00.028252) cg-prop: 	Property "cpuset.memory_spread_slab"
+(00.028269) cg-prop: 	Property "cpuset.sched_load_balance"
+(00.028299) cg-prop: 	Property "cpuset.sched_relax_domain_level"
+(00.028316) cg-prop: Parsing controller "blkio"
+(00.028336) cg-prop: 	Strategy "replace"
+(00.028354) cg-prop: 	Property "blkio.weight"
+(00.028369) cg-prop: Parsing controller "freezer"
+(00.028383) cg-prop: 	Strategy "replace"
+(00.028398) cg-prop: Parsing controller "perf_event"
+(00.028412) cg-prop: 	Strategy "replace"
+(00.028425) cg-prop: Parsing controller "net_cls"
+(00.028439) cg-prop: 	Strategy "replace"
+(00.028453) cg-prop: 	Property "net_cls.classid"
+(00.028466) cg-prop: Parsing controller "net_prio"
+(00.028482) cg-prop: 	Strategy "replace"
+(00.028495) cg-prop: 	Property "net_prio.ifpriomap"
+(00.028515) cg-prop: Parsing controller "pids"
+(00.028534) cg-prop: 	Strategy "replace"
+(00.028548) cg-prop: 	Property "pids.max"
+(00.028562) cg-prop: Parsing controller "devices"
+(00.028576) cg-prop: 	Strategy "replace"
+(00.028589) cg-prop: 	Property "devices.list"
+(00.028618) Preparing image inventory (version 1)
+(00.028662) Add pid ns 1 pid 48251
+(00.028683) Add net ns 2 pid 48251
+(00.028714) Add ipc ns 3 pid 48251
+(00.028732) Add uts ns 4 pid 48251
+(00.028753) Add time ns 5 pid 48251
+(00.028775) Add mnt ns 6 pid 48251
+(00.028790) Add user ns 7 pid 48251
+(00.028816) Add cgroup ns 8 pid 48251
+(00.028834) cg: Dumping cgroups for 48251
+(00.028870) cg:  `- New css ID 1
+(00.028884) cg:     `- [] -> [/user.slice/user-1000.slice/user@1000.service/app.slice/app-org.gnome.Terminal.slice/vte-spawn-0979ce1b-0023-4846-8338-53ccf79a5881.scope] [0]
+(00.028900) cg: Set 1 is criu one
+(00.028944) Detected cgroup V1 freezer
+(00.028990) Warn  (compel/src/lib/infect.c:129): Unable to interrupt task: 48033 (Operation not permitted)
+(00.029009) Unlock network
+(00.029025) Unfreezing tasks into 1
+(00.029039) 	Unseizing 48033 into 1
+(00.029052) Error (compel/src/lib/infect.c:358): Unable to detach from 48033: No such process
+(00.029084) Error (criu/cr-dump.c:2063): Dumping FAILED.

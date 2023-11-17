@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-java -XX:CRaCRestoreFrom=./crac-files
-
-
